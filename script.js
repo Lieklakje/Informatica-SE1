@@ -12,7 +12,6 @@ var raster = {
     stroke('grey');
     for (rij=0;rij<this.aantalRijen;rij++) {
       for (kolom=0;kolom<this.aantalKolommen;kolom++) {
-
   
         rect(kolom*this.celGrootte,rij*this.celGrootte,this.celGrootte,this.celGrootte);
       }
@@ -31,22 +30,22 @@ var jos = {
   gehaald: false,
 
   beweeg() {
-    /* left */
+    // links
     if (keyIsDown(65)) {
       this.x -= this.stapGrootte;
       this.frameNummer = 2;
     }
-    /* right */
+    // rechts
     if (keyIsDown(68)) {
       this.x += this.stapGrootte;
       this.frameNummer = 1;
     }
-    /* up */
+    // omhoog
     if (keyIsDown(87)) {
       this.y -= this.stapGrootte;
       this.frameNummer = 4;
     }
-    /* down */
+    // omlaag
     if (keyIsDown(83)) {
       this.y += this.stapGrootte;
       this.frameNummer = 5;
@@ -96,6 +95,28 @@ var alice = {
   }
 }
 
+//niewe vijand
+
+var eviljos = {
+  x: 700,
+  y: 200,
+  sprite: null,
+  stapGrootte: null,
+
+  beweeg() {
+    this.x += floor(random(-1,2))*this.stapGrootte;
+    this.y += floor(random(-1,2))*this.stapGrootte;
+
+    this.x = constrain(this.x,0,canvas.width - raster.celGrootte);
+    this.y = constrain(this.y,0,canvas.height - raster.celGrootte);
+  },
+
+  toon() {
+    image(this.sprite,this.x,this.y,raster.celGrootte,raster.celGrootte);
+  }
+}
+
+// pingpong
 var pingpong = {
   diameter: 50,
   straal: null,
@@ -125,14 +146,32 @@ var pingpong = {
   }
 }
 
+var bom1 = {
+  diameter: 50,
+  x: 600,
+  y: null,
+  speedX: 0,
+  speedY: 50,
+}
+  
+var bom2 = {
+  diameter: 50,
+  x: 800,
+  y: null,
+  speedX: 0,
+  speedY: 50,
+ // image(bom2, 800, 200, 50, 50);
+}
 
 function preload() {
   brug = loadImage("images/backgrounds/dame_op_brug_1800.jpg");
   alice.sprite = loadImage("images/sprites/Alice100px/Alice.png");
+  eviljos.sprite = loadImage("images/eviljos.webp");
   for (var b = 0;b < jos.aantalFrames;b++) {
     frameJos = loadImage("images/sprites/Jos100px/Jos_" + b + ".png");
     jos.animatie.push(frameJos);
-  bom = loadImage("images/downloads/5H2/INF/BombAngryBirds.png");
+  bom1 = loadImage("INF/BombAngryBirds.png");
+  bom2 = loadImage("INF/BombAngryBirds.png");
   }
 }
 
@@ -145,10 +184,14 @@ function setup() {
   raster.berekenCelGrootte();
   jos.stapGrootte = 1*raster.celGrootte;
   alice.stapGrootte = 1*raster.celGrootte;
-
+  eviljos.stapGrootte = 1*raster.celGrootte;
+  
   pingpong.straal = pingpong.diameter / 2;
   pingpong.x = pingpong.diameter;
   pingpong.y = pingpong.x;
+
+  image(bom1, 600, 200, 50, 50);
+  image(bom2, 800, 200, 50, 50);
 
 }
 
@@ -158,12 +201,29 @@ function draw() {
   jos.beweeg();
   alice.beweeg();
   pingpong.beweeg();
+  eviljos.beweeg();
+  bom1.beweeg();
+  bom2.beweeg();
+  bom1.toon();
+  bom2.toon();
+  eviljos.toon();
   jos.toon();
   alice.toon();
   pingpong.toon();
   if (jos.wordtGeraakt(alice)) {
+    background('red');
+    fill('white');
+    text("Je hebt verloren:(",30,300);
     noLoop();
   }
+
+  if (jos.wordtGeraakt(eviljos)) {
+    background('red');
+    fill('white');
+    text("Je hebt verloren:(",30,300);
+    noLoop();
+  }
+  
   if (jos.gehaald) {
     background('green');
     fill('white');
@@ -171,4 +231,16 @@ function draw() {
     noLoop();
   }
  
+
+  ///blauwe rand
+/* fill('blue');
+  rect(0,0,50,600);
+  fill('blue');
+  rect(850,0,50,600);
+  fill('blue');
+  rect(0,0,900,50);
+  //fill('blue');
+  //rect(0,500,1600,50);
+*/
+  
 }
