@@ -12,7 +12,6 @@ var raster = {
     stroke('grey');
     for (rij=0;rij<this.aantalRijen;rij++) {
       for (kolom=0;kolom<this.aantalKolommen;kolom++) {
-  
         rect(kolom*this.celGrootte,rij*this.celGrootte,this.celGrootte,this.celGrootte);
       }
     }
@@ -95,7 +94,7 @@ var alice = {
   }
 }
 
-//niewe vijand
+//nieuwe vijand
 
 var eviljos = {
   x: 700,
@@ -146,22 +145,20 @@ var pingpong = {
   }
 }
 
-var bom1 = {
-  diameter: 50,
-  x: 600,
-  y: null,
-  speedX: 0,
-  speedY: 50,
-}
-  
-var bom2 = {
-  diameter: 50,
-  x: 800,
-  y: null,
-  speedX: 0,
-  speedY: 50,
- // image(bom2, 800, 200, 50, 50);
-}
+var bom1;
+var bom2;
+
+var bomKolom1;
+var bomKolom2;
+
+var bomX2;
+var bomX2;
+
+var bomY1 = 100;
+var bomY2 = 100;
+
+var snelheid1 = 10;
+var snelheid2 = 40;
 
 function preload() {
   brug = loadImage("images/backgrounds/dame_op_brug_1800.jpg");
@@ -185,62 +182,96 @@ function setup() {
   jos.stapGrootte = 1*raster.celGrootte;
   alice.stapGrootte = 1*raster.celGrootte;
   eviljos.stapGrootte = 1*raster.celGrootte;
+  bom1.stapGrootte = 1*raster.celGrootte;
+  bom2.stapGrootte = 1*raster.celGrootte;
   
   pingpong.straal = pingpong.diameter / 2;
   pingpong.x = pingpong.diameter;
   pingpong.y = pingpong.x;
+  
+  bomX1 = random(460, 600);
+  bomX2 = random(650, 820);
 
-  image(bom1, 600, 200, 50, 50);
-  image(bom2, 800, 200, 50, 50);
+  bomKolom1 = floor(random(10, 18));
+  bomKolom2 = floor(random(10, 18));
+
+  while (bomKolom2 == bomKolom1) {
+    bomKolom2 = floor(random(10, 18));
+  }
+
+  bomX1 = bomKolom1*raster.celGrootte;
+  bomX2 = bomKolom2*raster.celGrootte;
 
 }
 
 function draw() {
   background(brug);
   raster.teken();
+  
   jos.beweeg();
   alice.beweeg();
   pingpong.beweeg();
   eviljos.beweeg();
-  bom1.beweeg();
-  bom2.beweeg();
-  bom1.toon();
-  bom2.toon();
-  eviljos.toon();
+
   jos.toon();
   alice.toon();
   pingpong.toon();
+  eviljos.toon();
+  
+  image(bom1, bomX1, bomY1, 50, 50);
+  image(bom2, bomX2, bomY2, 50, 50);
+
+  if (bomY1 > 500 || bomY1 < 50) {
+    snelheid1 = -snelheid1;
+  }
+  bomY1 = bomY1 + snelheid1;
+
+  if (bomY2 > 500 || bomY2 < 50) {
+    snelheid2 = -snelheid2;
+  }
+  bomY2 = bomY2 + snelheid2;
+  
   if (jos.wordtGeraakt(alice)) {
     background('red');
     fill('white');
-    text("Je hebt verloren:(",30,300);
+    text("Je hebt verloren :(",30,300);
     noLoop();
   }
 
   if (jos.wordtGeraakt(eviljos)) {
     background('red');
     fill('white');
-    text("Je hebt verloren:(",30,300);
+    text("Je hebt verloren :(",30,300);
+    noLoop();
+  }
+
+  if (jos.wordtGeraakt(bom1)) {
+    background('red');
+    fill('white');
+    text("Je hebt verloren :(",30,300);
+    noLoop();
+  }
+
+  if (jos.wordtGeraakt(bom2)) {
+    background('red');
+    fill('white');
+    text("Je hebt verloren :(",30,300);
     noLoop();
   }
   
   if (jos.gehaald) {
     background('green');
     fill('white');
-    text("Je hebt gewonnen!",30,300);
+    text("Je hebt gewonnen! ",30,300);
     noLoop();
   }
  
 
-  ///blauwe rand
-/* fill('blue');
-  rect(0,0,50,600);
-  fill('blue');
-  rect(850,0,50,600);
-  fill('blue');
-  rect(0,0,900,50);
-  //fill('blue');
-  //rect(0,500,1600,50);
-*/
-  
+  // blauwe rand
+  push();
+  noFill();
+  stroke('blue');
+  strokeWeight(8);
+  rect(4, 4, width - 8, height - 8);
+  pop();
 }
