@@ -1,3 +1,4 @@
+// Het raster is het speelveld
 var raster = {
   aantalRijen: 12,
   aantalKolommen: 18,
@@ -24,6 +25,8 @@ var raster = {
   },
 };
 
+// Jos is de speler waar je mee speelt, te besturen met WASD.
+// Het heeft ook een test die checkt of een vijand op hetzelfde coördinaat is met jos.
 var jos = {
   x: 400,
   y: 300,
@@ -55,6 +58,7 @@ var jos = {
       this.frameNummer = 5;
     }
 
+    // begrens de uitkomst, zodat jos niet het scherm uit kan
     this.x = constrain(this.x, 0, canvas.width);
     this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
 
@@ -82,16 +86,20 @@ var jos = {
   },
 };
 
+// Alice is een vijand
 var alice = {
   x: 700,
   y: 200,
   sprite: null,
   stapGrootte: null,
 
+  // willekeurige bewegen in de x en y richting, kan ook diagonaal zijn.
   beweeg() {
+    // uitkomst is -1, 0 of 1 keer de stap grootte
     this.x += floor(random(-1, 2)) * this.stapGrootte;
     this.y += floor(random(-1, 2)) * this.stapGrootte;
 
+    // begrens de uitkomst, zodat alice niet het scherm uit kan
     this.x = constrain(this.x, 0, canvas.width - raster.celGrootte);
     this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
   },
@@ -102,7 +110,6 @@ var alice = {
 };
 
 //nieuwe vijand
-
 var eviljos = {
   x: 700,
   y: 200,
@@ -110,9 +117,11 @@ var eviljos = {
   stapGrootte: null,
 
   beweeg() {
+    // uitkomst is -1, 0 of 1 keer de stap grootte
     this.x += floor(random(-1, 2)) * this.stapGrootte;
     this.y += floor(random(-1, 2)) * this.stapGrootte;
 
+    // begrens de uitkomst, zodat eviljos niet het scherm uit kan
     this.x = constrain(this.x, 0, canvas.width - raster.celGrootte);
     this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
   },
@@ -122,27 +131,33 @@ var eviljos = {
   },
 };
 
-//nieuwe vijand
-
-var bom1_obj = {
+//nieuwe vijand, bom1
+var bom1 = {
   x: 500,
   y: 200,
   sprite: null,
   stapGrootte: null,
   kolom: 0,
-  snelheid: 10,
-
+  richting: "omlaag",
+  
   beweeg() {
-    //this.y += floor(random(-1, 2)) * this.stapGrootte;
-    //this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
-
-    if (this.y > 500 || this.y < 50) {
-      this.snelheid = -1 * this.snelheid;
+    if (this.richting == "omlaag") {
+      this.y = this.y - this.stapGrootte;
+    } else {
+      this.y = this.y + this.stapGrootte;
     }
-    this.y = this.y + this.snelheid;
 
+    if (this.y > (canvas.height - raster.celGrootte)) {
+      this.richting = "omlaag";
+    }
+
+    if (this.y < (0 + raster.celGrootte)) {
+      this.richting = "omhoog";
+    }
+    
+    // begrens de uitkomst, zodat bom1 niet het scherm uit kan
     this.x = constrain(this.x, 0, canvas.width - raster.celGrootte);
-    //this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
+    this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
   },
 
   toon() {
@@ -150,24 +165,34 @@ var bom1_obj = {
   },
 };
 
-var bom2_obj = {
+var bom2 = {
   x: 700,
   y: 200,
   sprite: null,
   stapGrootte: null,
   kolom: 0,
-  snelheid: 40,
 
   beweeg() {
-    if (this.y > 500 || this.y < 50) {
-      this.snelheid = -1 * this.snelheid;
+    // Richting naar beneden, stap er af, richting omhoog, stap naar boven
+    if (this.richting == "omlaag") {
+      this.y = this.y - this.stapGrootte;
+    } else {
+      this.y = this.y + this.stapGrootte;
     }
-    this.y = this.y + this.snelheid;
 
-    //this.y += floor(random(-1, 2)) * this.stapGrootte;
+    // Laatste plekje bereikt? Andere kant op
+    if (this.y > (canvas.height - raster.celGrootte)) {
+      this.richting = "omlaag";
+    }
 
+    // Laatste plekje bereikt? Andere kant op
+    if (this.y < (0 + raster.celGrootte)) {
+      this.richting = "omhoog";
+    }
+
+    // begrens de uitkomst, zodat bom2 niet het scherm uit kan
     this.x = constrain(this.x, 0, canvas.width - raster.celGrootte);
-    //this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
+    this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
   },
 
   toon() {
@@ -205,6 +230,7 @@ var pingpong = {
   },
 };
 
+// inladen van alle plaatjes, ook wel sprites
 function preload() {
   brug = loadImage("images/backgrounds/dame_op_brug_1800.jpg");
   alice.sprite = loadImage("images/sprites/Alice100px/Alice.png");
@@ -213,10 +239,11 @@ function preload() {
     frameJos = loadImage("images/sprites/Jos100px/Jos_" + b + ".png");
     jos.animatie.push(frameJos);
   }
-  bom1_obj.sprite = loadImage("INF/BombAngryBirds.png");
-  bom2_obj.sprite = loadImage("INF/BombAngryBirds.png");
+  bom1.sprite = loadImage("INF/BombAngryBirds.png");
+  bom2.sprite = loadImage("INF/BombAngryBirds.png");
 }
 
+// start waarden van alles
 function setup() {
   canvas = createCanvas(900, 600);
   canvas.parent();
@@ -224,25 +251,30 @@ function setup() {
   textFont("Verdana");
   textSize(90);
   raster.berekenCelGrootte();
+
+  // Berekende cel grote in pixels is een grondgetal voor een stap
   jos.stapGrootte = 1 * raster.celGrootte;
   alice.stapGrootte = 1 * raster.celGrootte;
   eviljos.stapGrootte = 1 * raster.celGrootte;
-  bom1_obj.stapGrootte = 1 * raster.celGrootte;
-  bom2_obj.stapGrootte = 1 * raster.celGrootte;
+  bom1.stapGrootte = 1 * raster.celGrootte;
+  bom2.stapGrootte = 2 * raster.celGrootte;
 
   pingpong.straal = pingpong.diameter / 2;
   pingpong.x = pingpong.diameter;
   pingpong.y = pingpong.x;
 
-  bom1_obj.kolom = floor(random(10, 17));
-  bom2_obj.kolom = floor(random(10, 17));
+  // Willekeurige kolom voor de bommen
+  bom1.kolom = floor(random(10, 17));
+  bom2.kolom = floor(random(10, 17));
 
-  while (bom1_obj.kolom == bom2_obj.kolom) {
-    bom2_obj.kolom = floor(random(10, 17));
+  // Geen twee bommen in 1 kolom, doorzoeken naar vrije kolom.
+  while (bom1.kolom == bom2.kolom) {
+    bom2.kolom = floor(random(10, 17));
   }
 
-  bom1_obj.x = bom1_obj.kolom * raster.celGrootte;
-  bom2_obj.x = bom2_obj.kolom * raster.celGrootte;
+  // De bom x waarde is afhankelijk van waar die moet komen
+  bom1.x = bom1.kolom * raster.celGrootte;
+  bom2.x = bom2.kolom * raster.celGrootte;
 }
 
 function draw() {
@@ -253,15 +285,15 @@ function draw() {
   alice.beweeg();
   pingpong.beweeg();
   eviljos.beweeg();
-  bom1_obj.beweeg();
-  bom2_obj.beweeg();
+  bom1.beweeg();
+  bom2.beweeg();
 
   jos.toon();
   alice.toon();
   pingpong.toon();
   eviljos.toon();
-  bom1_obj.toon();
-  bom2_obj.toon();
+  bom1.toon();
+  bom2.toon();
 
   if (jos.wordtGeraakt(alice)) {
     background("red");
@@ -277,14 +309,14 @@ function draw() {
     noLoop();
   }
 
-  if (jos.wordtGeraakt(bom1_obj)) {
+  if (jos.wordtGeraakt(bom1)) {
     background("red");
     fill("white");
     text("Je hebt verloren :(", 30, 300);
     noLoop();
   }
 
-  if (jos.wordtGeraakt(bom2_obj)) {
+  if (jos.wordtGeraakt(bom2)) {
     background("red");
     fill("white");
     text("Je hebt verloren :(", 30, 300);
