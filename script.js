@@ -26,7 +26,6 @@ var raster = {
 };
 
 // Jos is de speler waar je mee speelt, te besturen met WASD.
-// Het heeft ook een test die checkt of een vijand op hetzelfde coördinaat is met jos.
 var jos = {
   x: 400,
   y: 300,
@@ -37,28 +36,28 @@ var jos = {
   gehaald: false,
 
   beweeg() {
-    // links
+    // Links
     if (keyIsDown(65)) {
       this.x -= this.stapGrootte;
       this.frameNummer = 2;
     }
-    // rechts
+    // Rechts
     if (keyIsDown(68)) {
       this.x += this.stapGrootte;
       this.frameNummer = 1;
     }
-    // omhoog
+    // Omhoog
     if (keyIsDown(87)) {
       this.y -= this.stapGrootte;
       this.frameNummer = 4;
     }
-    // omlaag
+    // Omlaag
     if (keyIsDown(83)) {
       this.y += this.stapGrootte;
       this.frameNummer = 5;
     }
 
-    // begrens de uitkomst, zodat jos niet het scherm uit kan
+    // Begrenst de uitkomst, zodat Jos niet het scherm uit kan
     this.x = constrain(this.x, 0, canvas.width);
     this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
 
@@ -67,6 +66,7 @@ var jos = {
     }
   },
 
+  // Checkt of Jos de vijand geraakt heeft (dus op hetzelfde coördinaat)
   wordtGeraakt(vijand) {
     if (this.x == vijand.x && this.y == vijand.y) {
       return true;
@@ -86,20 +86,20 @@ var jos = {
   },
 };
 
-// Alice is een vijand
+// Vijand Alice
 var alice = {
   x: 700,
   y: 200,
   sprite: null,
   stapGrootte: null,
 
-  // willekeurige bewegen in de x en y richting, kan ook diagonaal zijn.
+  // Willekeurig bewegen in de x en y richting of diagonaal
   beweeg() {
-    // uitkomst is -1, 0 of 1 keer de stap grootte
+    // Uitkomst is -1, 0 of 1 keer de stap grootte
     this.x += floor(random(-1, 2)) * this.stapGrootte;
     this.y += floor(random(-1, 2)) * this.stapGrootte;
 
-    // begrens de uitkomst, zodat alice niet het scherm uit kan
+    // Begrenst de uitkomst, zodat Alice niet het scherm uit kan
     this.x = constrain(this.x, 0, canvas.width - raster.celGrootte);
     this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
   },
@@ -109,7 +109,7 @@ var alice = {
   },
 };
 
-//nieuwe vijand
+// Nieuwe vijand Eviljos
 var eviljos = {
   x: 700,
   y: 200,
@@ -117,11 +117,11 @@ var eviljos = {
   stapGrootte: null,
 
   beweeg() {
-    // uitkomst is -1, 0 of 1 keer de stap grootte
+    // Uitkomst is -1, 0 of 1 keer de stap grootte
     this.x += floor(random(-1, 2)) * this.stapGrootte;
     this.y += floor(random(-1, 2)) * this.stapGrootte;
 
-    // begrens de uitkomst, zodat eviljos niet het scherm uit kan
+    // Begrenst de uitkomst, zodat Eviljos niet het scherm uit kan
     this.x = constrain(this.x, 0, canvas.width - raster.celGrootte);
     this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
   },
@@ -131,7 +131,7 @@ var eviljos = {
   },
 };
 
-//nieuwe vijand, bom1
+// Nieuwe vijand bom1
 var bom1 = {
   x: 500,
   y: 200,
@@ -155,7 +155,7 @@ var bom1 = {
       this.richting = "omhoog";
     }
     
-    // begrens de uitkomst, zodat bom1 niet het scherm uit kan
+    // Begrenst de uitkomst, zodat bom1 niet het scherm uit kan
     this.x = constrain(this.x, 0, canvas.width - raster.celGrootte);
     this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
   },
@@ -173,24 +173,24 @@ var bom2 = {
   kolom: 0,
 
   beweeg() {
-    // Richting naar beneden, stap er af, richting omhoog, stap naar boven
+    // Richting naar beneden; stap er af, richting omhoog; stap naar boven
     if (this.richting == "omlaag") {
       this.y = this.y - this.stapGrootte;
     } else {
       this.y = this.y + this.stapGrootte;
     }
 
-    // Laatste plekje bereikt? Andere kant op
+    // Laatste positie bereikt? Andere kant op
     if (this.y > (canvas.height - raster.celGrootte)) {
       this.richting = "omlaag";
     }
 
-    // Laatste plekje bereikt? Andere kant op
+    // Laatste positie bereikt? Andere kant op
     if (this.y < (0 + raster.celGrootte)) {
       this.richting = "omhoog";
     }
 
-    // begrens de uitkomst, zodat bom2 niet het scherm uit kan
+    // Begrenst de uitkomst, zodat bom2 niet het scherm uit kan
     this.x = constrain(this.x, 0, canvas.width - raster.celGrootte);
     this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
   },
@@ -230,11 +230,14 @@ var pingpong = {
   },
 };
 
-// inladen van alle plaatjes, ook wel sprites
+var WindowsScherm;
+var WindowsSchermX = 0;
+
+// Inladen van alle images / sprites
 function preload() {
-  brug = loadImage("images/backgrounds/dame_op_brug_1800.jpg");
+  WindowsScherm = loadImage("INF/WindowsScherm.jpeg");
   alice.sprite = loadImage("images/sprites/Alice100px/Alice.png");
-  eviljos.sprite = loadImage("images/eviljos.webp");
+  eviljos.sprite = loadImage("INF/eviljos.png");
   for (var b = 0; b < jos.aantalFrames; b++) {
     frameJos = loadImage("images/sprites/Jos100px/Jos_" + b + ".png");
     jos.animatie.push(frameJos);
@@ -243,7 +246,7 @@ function preload() {
   bom2.sprite = loadImage("INF/BombAngryBirds.png");
 }
 
-// start waarden van alles
+// Start waarden van alles
 function setup() {
   canvas = createCanvas(900, 600);
   canvas.parent();
@@ -252,7 +255,7 @@ function setup() {
   textSize(90);
   raster.berekenCelGrootte();
 
-  // Berekende cel grote in pixels is een grondgetal voor een stap
+  // Berekent de cel grootte in pixels is een grondgetal voor een stap
   jos.stapGrootte = 1 * raster.celGrootte;
   alice.stapGrootte = 1 * raster.celGrootte;
   eviljos.stapGrootte = 1 * raster.celGrootte;
@@ -267,20 +270,29 @@ function setup() {
   bom1.kolom = floor(random(10, 17));
   bom2.kolom = floor(random(10, 17));
 
-  // Geen twee bommen in 1 kolom, doorzoeken naar vrije kolom.
+  // Geen twee bommen in 1 kolom
   while (bom1.kolom == bom2.kolom) {
     bom2.kolom = floor(random(10, 17));
   }
 
-  // De bom x waarde is afhankelijk van waar die moet komen
+  // De bom x waarde is afhankelijk van in welke kolom die moet komen
   bom1.x = bom1.kolom * raster.celGrootte;
   bom2.x = bom2.kolom * raster.celGrootte;
 }
 
 function draw() {
-  background(brug);
+// Bewegende achtergrond en het raster
+  background(WindowsScherm);
+  image(WindowsScherm,WindowsSchermX,0);
+  image(WindowsScherm,WindowsSchermX + WindowsScherm.width,0);
+ 
   raster.teken();
-
+  
+  WindowsSchermX--;
+  if (WindowsSchermX == -WindowsScherm.width) {
+    WindowsSchermX = 0;
+  }  
+  
   jos.beweeg();
   alice.beweeg();
   pingpong.beweeg();
@@ -330,7 +342,7 @@ function draw() {
     noLoop();
   }
 
-  // blauwe rand
+  // Blauwe rand
   push();
   noFill();
   stroke("blue");
